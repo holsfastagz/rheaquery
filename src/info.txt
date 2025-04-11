@@ -1,0 +1,28 @@
+
+Rheaquery: A small pipeline for positive selection analysis in Biodiversity Discovery.
+
+Usage: rheaquery -m mode <options>
+
+Modes:
+    
+    blast: Downloads homologous sequences from NCBI and performs a BLAST
+    searches against our assemblies.
+        
+        rheaquery -m blast -a accessions.txt -f assemblies_dir -o outdir
+        -a  file containing NCBI protein accession number(s)
+        -f  directory containing assemblies
+        -o  output directory (default .)
+    
+    pfam2go: Annotates our domains using the pfam2go database.
+
+        rheaquery -m pfam2go -p hmm.out -d pfam2go -o outdir 
+        -p  output file of hmmscan
+        -d  pfam2go file
+        -o  output directory (default .)
+
+    soup: Parses PoSeiDon output files.
+
+        rheaquery -m soup -f gene_dir -o outdir
+        -f  PoSeiDon output directory 
+        -o output directory (default .)
+

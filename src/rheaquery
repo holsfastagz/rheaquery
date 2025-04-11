@@ -1,0 +1,97 @@
+#!/bin/bash
+
+help_function() {
+    cat ~/.local/bin/rheaquery/src/info.txt
+}
+
+while getopts "hm:a:f:o:l:r:p:d:" opt
+do
+    case ${opt} in
+        h ) help_function ; exit 0 ;;
+        m ) mode=$OPTARG ;;          # mode (blast or stockholm)
+        a ) parameter_a=$OPTARG ;;   # file containing accession numbers
+        d ) parameter_d=$OPTARG ;;   # various databases
+        f ) parameter_f=$OPTARG ;;   # directory containing assemblies
+        o ) parameter_o=$OPTARG ;;   # output directory
+        l ) parameter_l=$OPTARG ;;   # alignment file (FASTA format)
+        r ) parameter_r=$OPTARG ;;   # multi fasta file
+        p ) parameter_p=$OPTARG ;;   # hmmer3 file with pfam annotations
+        * ) help_function ; exit 1 ;;
+    esac
+done
+
+# make output directory current directory if empty
+if [[ -z $parameter_o ]]; then parameter_o="." ; fi
+
+if [ "$mode" == "blast" ]
+then
+    # Check if input parameters are correct
+    [ -f ${parameter_a} ] && accessions=$(readlink -f ${parameter_a}) \
+    || (echo "ERROR: File containing accession numbers does not exist." ; exit 1)
+
+    [ -d ${parameter_f} ] && assemblies=$(readlink -f ${parameter_f}) \
+    || (echo "ERROR: Assembly directory does not exist." ; exit 1)
+
+    [ -d ${parameter_o} ] || mkdir ${parameter_o}
+    outdir=$(readlink -f ${parameter_o})
+
+elif [ "$mode" == "pfam2go" ]
+then
+    [ -f ${parameter_p} ] && hmmfile=$(readlink -f ${parameter_p}) \
+    || (echo "ERROR: HMMR output file does not exist." ; exit 1)
+    
+    [ -f ${parameter_d} ] && dbfile=$(readlink -f ${parameter_d}) \
+    || (echo "ERROR: pfam2go database does not exist" ; exit 1)
+
+    [ -d ${parameter_o} ] || mkdir ${parameter_o}
+    outdir=$(readlink -f ${parameter_o})
+
+elif [ "$mode" == "soup" ]
+then
+    [ -d ${parameter_f} ] && pdir=$(readlink -f ${parameter_f}) \
+    || (echo "ERROR: PoSeiDon directory does not exist" ; exit 1)
+
+    [ -d ${parameter_o} ] || mkdir ${parameter_o}
+    outdir=$(readlink -f ${parameter_o})
+
+elif [ "$mode" == "stockholm" ]
+then
+    [ -f ${parameter_l} ] && alignment=$(readlink -f ${parameter_l}) \
+    || (echo "ERROR: Alignment FASTA file does not exist." ; exit 1) 
+fi
+
+################################################################################
+
+if [ "$mode" == "blast" ]
+then
+    echo -e "Thanks for using Rheaquery!\n\n###\n"
+
+    # Step 1: Download orthologous sequences from genbank
+    echo -e "Downloading protein sequences from Genbank . . .\n"
+    bash 01-genbankdl.sh "$accessions" "$outdir"
+
+    # Step 2: Extract orthologous sequences from our assemblies
+    echo -e "\nFinding orthologous sequences . . .\n"
+    bash 02-finding-homo-seqs.sh "$assemblies" "$outdir"
+
+    echo -e "\nRheaquery completed successfully! Files now ready for PoSeiDon!"
+
+elif [ "$mode" == "pfam2go" ]
+then
+    echo "\nThanks for using Rheaquery! Now running the pfam2go module!\n\n"
+    python3 ~/.local/bin/rheaquery/src/pfam2go.py "$hmmfile" "$outdir" "$dbfile"
+
+elif [ "$mode" == "soup" ]
+then
+    echo "\nThanks for using Rheaquery! Now running the soup module!\n\n"
+    python3 ~/.local/bin/rheaquery/src/poseidon_soup.py "$pdir" "$outdir"
+
+elif [ "$mode" == "stockholm" ]
+then
+    # Step 1: Convert FASTA alignment to stockholm format
+    echo "Converting FASTA to Stockholm . . ."
+    python3 ~/.local/bin/rheaquery/src/stockholm.py "$alignment" "$outdir"
+    echo "FASTA converted to Stockholm!"
+    echo "Thank you for using Rheaquery!"
+
+fi
