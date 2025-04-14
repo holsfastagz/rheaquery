@@ -37,6 +37,13 @@ from NCBI.
 rheaquery -m blast -a accession.txt -f assemblies/ -o outdir/
 ```
 
+- `-a`: a text file containing the NCBI accession numbers of a homologous
+protein.
+
+- `-f`: a directory containing the transcriptome assemblies.
+
+- `-o`: the output directory (default .).
+
 2. pfam2go - annotate protein domains with GO terms using the pfam2go database,
 with the results of hmmscan. 
 
@@ -44,9 +51,19 @@ with the results of hmmscan.
 rheaquery -m pfam2go -p gene_hmm.out -d pfam2go -o outdir/
 ```
 
+- `-p`: the hmmscan output file.
+
+- `-d`: the pfam2go database.
+
+- `-o`: output directory (default .).
+
 3. soup - parse PoSeiDon results and record amino acid positions of positively-
 selected codons in a representative sequence.
 
 ```sh
 rheaquery -m soup -f gene_out/ -o outdir/
 ```
+
+- `-f`: PoSeiDon output directory for a gene, e.g. (results/pax6).
+
+- `-o`: output directory (default .).
