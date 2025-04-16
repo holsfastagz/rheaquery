@@ -20,6 +20,19 @@ source ~/.bashrc
 
 Rheaquery should now be installed. You can use `rheaquery -h` to make sure.
 
+## Dependencies
+
+- numpy
+- pandas
+- biopython
+- beautifulsoup4
+
+All dependencies can be downloaded using the following command:
+
+```sh
+pip install numpy pandas biopython beautifulsoup4
+```
+
 ## Usage
 
 Rheaquery's basic usage is:
