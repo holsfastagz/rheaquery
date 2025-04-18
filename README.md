@@ -41,6 +41,18 @@ Rheaquery's basic usage is:
 rheaquery -m mode <options>
 ```
 
+To check version:
+
+```sh
+rheaquery -v
+```
+
+To update to latest version:
+
+```sh
+rheaquery -u
+```
+
 Rheaquery makes use of three software modules.
 
 1. blast - identify homologous sequences in our assemblies based on a reference
