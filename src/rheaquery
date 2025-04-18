@@ -4,7 +4,7 @@ help_function() {
     cat ~/.local/bin/rheaquery/src/info.txt
 }
 
-while getopts "hm:a:f:o:l:r:p:d:" opt
+while getopts "hm:a:f:o:l:r:p:d:uv" opt
 do
     case ${opt} in
         h ) help_function ; exit 0 ;;
@@ -16,6 +16,8 @@ do
         l ) parameter_l=$OPTARG ;;   # alignment file (FASTA format)
         r ) parameter_r=$OPTARG ;;   # multi fasta file
         p ) parameter_p=$OPTARG ;;   # hmmer3 file with pfam annotations
+        u ) bash update.sh ; exit 0 ;; 
+        v ) echo "Rheaquery v1.1" ; exit 0;;
         * ) help_function ; exit 1 ;;
     esac
 done
